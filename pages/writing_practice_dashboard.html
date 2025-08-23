@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 영어 작문 트레이너 - 대시보드</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script src="../public/config.js"></script>
+    <script src="../js/gemini-ai-service.js"></script>
+<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Faienglish1590back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.8"></script>
+</head>
+<body class="bg-background font-body text-text-primary min-h-screen">
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-surface border-b border-border shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-heading font-semibold text-text-primary">AI 영어 작문</h1>
+                </div>
+                
+                <!-- User Menu (simplified, no API inputs/status) -->
+                <div class="flex items-center gap-3"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+        <!-- Welcome Section with Fresh Start Notice -->
+        <section class="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-6 border border-border-light">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-heading font-semibold text-text-primary">새로운 시작! 👋</h2>
+                    <p class="text-text-secondary">실제 GEMINI AI로 영어 작문 분석을 받아보세요</p>
+                </div>
+                
+                <div class="flex items-center gap-4"></div>
+            </div>
+        </section>
+
+        <!-- Start Writing CTA -->
+        <section class="text-center">
+            <a href="topic_selection_writing_interface.html?new=1" class="inline-block w-full sm:w-auto">
+                <button class="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white font-semibold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 min-h-44 min-w-44">
+                    <div class="flex flex-col items-center gap-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                        <span class="text-xl">작문 시작하기</span>
+                        <span class="text-sm opacity-90">AI 피드백과 함께 연습해 보세요</span>
+                    </div>
+                </button>
+            </a>
+        </section>
+
+        
+
+        <!-- Features Preview -->
+        <section class="bg-surface rounded-2xl p-6 border border-border shadow-sm">
+            <h3 class="text-lg font-heading font-semibold text-text-primary mb-4">GEMINI AI 기능</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-text-primary">실시간 문법 분석</h4>
+                        <p class="text-sm text-text-secondary">정확한 문법 오류 탐지 및 수정 제안</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-warning-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-text-primary">어휘 수준 평가</h4>
+                        <p class="text-sm text-text-secondary">사용한 어휘의 적절성과 다양성 분석</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-text-primary">문장 유창성 검사</h4>
+                        <p class="text-sm text-text-secondary">자연스러운 문장 흐름과 구조 분석</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-secondary-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-text-primary">개선 제안</h4>
+                        <p class="text-sm text-text-secondary">더 나은 표현과 구체적인 개선 방향 제시</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="topic_selection_writing_interface.html?new=1" class="bg-surface hover:bg-gray-50 rounded-xl p-4 border border-border shadow-sm transition-colors group">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-text-primary">작문 시작</h4>
+                        <p class="text-xs text-text-secondary">자유 주제로 바로 작성</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- History -->
+            <a href="writing_history.html" class="bg-surface hover:bg-gray-50 rounded-xl p-4 border border-border shadow-sm transition-colors group">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center group-hover:bg-secondary-200 transition-colors">
+                        <svg class="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3M9 17H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-text-primary">히스토리</h4>
+                        <p class="text-xs text-text-secondary">이전 작문과 피드백 보기</p>
+                    </div>
+                </div>
+            </a>
+
+            
+
+            <button id="helpBtn" onclick="showHelp()" class="bg-surface hover:bg-gray-50 rounded-xl p-4 border border-border shadow-sm transition-colors group">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center group-hover:bg-accent-200 transition-colors">
+                        <svg class="w-5 h-5 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-text-primary">도움말</h4>
+                        <p class="text-xs text-text-secondary">사용법 및 FAQ</p>
+                    </div>
+                </div>
+            </button>
+        </section>
+    </main>
+
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            setupEventListeners();
+        });
+
+        function initializeDashboard() {
+            // Clear all old mock data on page load
+            console.log('대시보드 초기화 - 기존 데이터 정리 중...');
+            
+            // Update API configuration section
+            updateAPIConfigSection();
+            
+            // Initialize fresh state
+            console.log('새로운 세션이 시작되었습니다.');
+        }
+
+        function setupEventListeners() {
+            // Clear data button (may be removed)
+            const clearBtn = document.getElementById('clearDataBtn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    clearAllData();
+                });
+            }
+
+            // Help button
+            const helpBtn = document.getElementById('helpBtn');
+            if (helpBtn) {
+                helpBtn.addEventListener('click', function() {
+                    showHelp();
+                });
+            }
+        }
+        // No API UI or settings; using local .env configuration only
+
+        function showHelp() {
+            const helpContent = `
+🚀 AI 영어 작문 트레이너 사용법
+
+1️⃣ 작문 시작
+- "작문 시작"을 눌러 자유 주제로 바로 작성하세요
+- 최소 50단어 작성 후 "AI 분석 받기" 버튼이 활성화됩니다
+
+2️⃣ AI 분석
+- 문법/어휘/유창성 점수와 기준, 수정·개선 제안을 확인하세요
+- 분석 결과와 원문, 수정/개선 내용은 히스토리에 자동 저장됩니다
+
+3️⃣ 히스토리
+- 대시보드의 "히스토리"에서 지난 작문과 피드백을 다시 볼 수 있고,
+  항목별 삭제 또는 전체 삭제가 가능합니다
+
+❓ 참고
+- 이 버전은 개인 사용을 위해 설정이 내장되어 있으며 별도의 API 입력이 필요 없습니다
+ - 모든 기록은 사용자의 브라우저 로컬 스토리지에만 저장됩니다
+            `;
+            
+            alert(helpContent);
+        }
+    </script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

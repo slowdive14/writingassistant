@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --color-primary: #2563EB; /* blue-600 */
+  --color-primary-50: #EFF6FF; /* blue-50 */
+  --color-primary-100: #DBEAFE; /* blue-100 */
+  --color-primary-500: #3B82F6; /* blue-500 */
+  --color-primary-600: #2563EB; /* blue-600 */
+  --color-primary-700: #1D4ED8; /* blue-700 */
+  
+  /* Secondary Colors */
+  --color-secondary: #059669; /* emerald-600 */
+  --color-secondary-50: #ECFDF5; /* emerald-50 */
+  --color-secondary-100: #D1FAE5; /* emerald-100 */
+  --color-secondary-500: #10B981; /* emerald-500 */
+  --color-secondary-600: #059669; /* emerald-600 */
+  --color-secondary-700: #047857; /* emerald-700 */
+  
+  /* Accent Colors */
+  --color-accent: #F59E0B; /* amber-500 */
+  --color-accent-50: #FFFBEB; /* amber-50 */
+  --color-accent-100: #FEF3C7; /* amber-100 */
+  --color-accent-400: #FBBF24; /* amber-400 */
+  --color-accent-500: #F59E0B; /* amber-500 */
+  --color-accent-600: #D97706; /* amber-600 */
+  
+  /* Background Colors */
+  --color-background: #FAFBFC; /* slate-50 */
+  --color-surface: #FFFFFF; /* white */
+  
+  /* Text Colors */
+  --color-text-primary: #1F2937; /* gray-800 */
+  --color-text-secondary: #6B7280; /* gray-500 */
+  
+  /* Status Colors */
+  --color-success: #10B981; /* emerald-500 */
+  --color-success-50: #ECFDF5; /* emerald-50 */
+  --color-success-100: #D1FAE5; /* emerald-100 */
+  
+  --color-warning: #F59E0B; /* amber-500 */
+  --color-warning-50: #FFFBEB; /* amber-50 */
+  --color-warning-100: #FEF3C7; /* amber-100 */
+  
+  --color-error: #EF4444; /* red-500 */
+  --color-error-50: #FEF2F2; /* red-50 */
+  --color-error-100: #FEE2E2; /* red-100 */
+  
+  /* Border Colors */
+  --color-border: #E5E7EB; /* gray-200 */
+  --color-border-light: #F3F4F6; /* gray-100 */
+  
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  
+  /* Animation Timing */
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Custom Animation Classes */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Micro-interaction Classes */
+.btn-micro {
+  transition: all 150ms var(--ease-out);
+}
+
+.btn-micro:hover {
+  transform: scale(0.98);
+}
+
+.btn-micro:active {
+  transform: scale(0.96);
+}
+
+/* Progressive Disclosure */
+.disclosure-content {
+  transition: height 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+/* Contextual Tooltips */
+.tooltip {
+  transition: opacity 200ms var(--ease-out);
+  transition-delay: 200ms;
+}
+
+/* Contextual Color Coding */
+.highlight-grammar {
+  background-color: rgba(239, 68, 68, 0.4); /* error with 40% opacity */
+}
+
+.highlight-vocabulary {
+  background-color: rgba(245, 158, 11, 0.4); /* warning with 40% opacity */
+}
+
+.highlight-flow {
+  background-color: rgba(37, 99, 235, 0.4); /* primary with 40% opacity */
+}
+
+/* Success Animation */
+.success-bounce {
+  animation: bounce 0.6s var(--ease-spring);
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}

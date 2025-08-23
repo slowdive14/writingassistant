@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 피드백 분석 - AI 영어 작문 트레이너</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script src="../public/config.js"></script>
+    <script src="../js/gemini-ai-service.js"></script>
+<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Faienglish1590back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.8"></script>
+</head>
+<body class="bg-background font-body text-text-primary min-h-screen">
+    <!-- Modal Backdrop -->
+    <div id="modalBackdrop" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <!-- Modal Container -->
+        <div id="feedbackModal" class="bg-surface rounded-2xl shadow-feedback max-w-4xl w-full max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-100">
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-surface border-b border-border-light px-6 py-4 flex items-center justify-between z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-heading font-semibold text-text-primary">AI 피드백 분석</h2>
+                </div>
+                
+                <button id="closeModal" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="overflow-y-auto max-h-[calc(90vh-80px)]" id="modalContent">
+                <!-- Content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="bg-surface rounded-2xl p-8 text-center max-w-sm mx-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+            <h3 class="text-lg font-heading font-semibold text-text-primary mb-2">AI 분석 중...</h3>
+            <p class="text-text-secondary text-sm" id="loadingMessage">작문을 분석하고 있습니다...</p>
+            <div class="mt-4 bg-gray-200 rounded-full h-2">
+                <div id="analysisProgress" class="bg-primary-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-surface rounded-2xl p-8 text-center max-w-sm mx-4">
+            <div class="w-16 h-16 bg-error-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-error-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-heading font-semibold text-text-primary mb-2">분석 오류</h3>
+            <p class="text-text-secondary text-sm mb-4" id="errorMessage">분석 중 오류가 발생했습니다.</p>
+            <div class="flex gap-3">
+                <button id="retryAnalysis" class="flex-1 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    다시 시도
+                </button>
+                <button id="closeError" class="flex-1 bg-gray-100 hover:bg-gray-200 text-text-primary font-medium py-2 px-4 rounded-lg transition-colors">
+                    닫기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Setup Modal -->
+    <div id="apiKeyModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-surface rounded-2xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-warning-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0111 7.243V5a2 2 0 012-2h2a2 2 0 012 2v2z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-heading font-semibold text-text-primary mb-2">GEMINI API 키 설정</h3>
+                <p class="text-text-secondary text-sm">AI 분석을 위해 GEMINI API 키가 필요합니다.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="apiKeyInput" class="block text-sm font-medium text-text-primary mb-2">API 키</label>
+                    <input type="password" id="apiKeyInput" placeholder="GEMINI API 키를 입력하세요" class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" />
+                </div>
+                
+                <div class="bg-accent-50 border border-accent-200 rounded-lg p-4">
+                    <p class="text-sm text-accent-700">
+                        <strong>API 키 획득 방법:</strong>
+                    </p>
+                    <ol class="text-sm text-accent-600 mt-2 list-decimal list-inside space-y-1">
+                        <li><a href="https://aistudio.google.com/app/apikey" target="_blank" class="underline">Google AI Studio</a>에 접속</li>
+                        <li>Google 계정으로 로그인</li>
+                        <li>"Create API Key" 버튼 클릭</li>
+                        <li>생성된 API 키를 복사하여 위에 입력</li>
+                    </ol>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="cancelApiKey" class="flex-1 bg-gray-100 hover:bg-gray-200 text-text-primary font-medium py-2 px-4 rounded-lg transition-colors">
+                        취소
+                    </button>
+                    <button id="saveApiKey" class="flex-1 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        저장하고 분석 시작
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let aiService;
+    let currentSubmission = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AI service
+        aiService = new GeminiAIService();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Start analysis process
+        initializeAnalysis();
+    });
+
+    function setupEventListeners() {
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        
+        // Close on backdrop click
+        document.getElementById('modalBackdrop').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Error handling
+        document.getElementById('retryAnalysis').addEventListener('click', retryAnalysis);
+        document.getElementById('closeError').addEventListener('click', showErrorAndReturn);
+        
+        // API Key setup
+        document.getElementById('cancelApiKey').addEventListener('click', showErrorAndReturn);
+        document.getElementById('saveApiKey').addEventListener('click', saveApiKeyAndAnalyze);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (!document.getElementById('loadingState').classList.contains('hidden')) {
+                    return; // Don't allow escape during loading
+                }
+                closeModal();
+            }
+        });
+    }
+
+    async function initializeAnalysis() {
+        try {
+            // Clear old data but preserve the submission we just saved
+            GeminiAIService.clearAllData({ silent: true, reload: false, exclude: ['currentSubmission'] });
+            
+            // Get current submission
+            currentSubmission = getCurrentSubmission();
+            if (!currentSubmission) {
+                // Instead of throwing error immediately, provide better options
+                showNoDataErrorWithOptions();
+                return;
+            }
+
+            // Validate submission data structure
+            if (!isValidSubmission(currentSubmission)) {
+                console.warn('Invalid submission data structure:', currentSubmission);
+                showNoDataErrorWithOptions();
+                return;
+            }
+
+            // Check if API key is configured
+            if (!GeminiAIService.isConfigured()) {
+                showApiKeyModal();
+                return;
+            }
+
+            // Start analysis
+            await performAnalysis();
+            
+        } catch (error) {
+            console.error('초기화 오류:', error);
+            showError(error.message);
+        }
+    }
+
+    function getCurrentSubmission() {
+        // Try different possible sources for submission data with detailed logging
+        const sources = [
+            { key: 'currentSubmission', name: 'Current Submission' },
+            { key: 'currentEssay', name: 'Current Essay' },
+            { key: 'lastSubmission', name: 'Last Submission' },
+            { key: 'draftSubmission', name: 'Draft Submission' }
+        ];
+
+        console.log('🔍 Searching for submission data...');
+        
+        for (const source of sources) {
+            const data = localStorage.getItem(source.key);
+            console.log(`📋 Checking ${source.name} (${source.key}):`, data ? 'Found' : 'Not found');
+            
+            if (data) {
+                try {
+                    const parsedData = JSON.parse(data);
+                    console.log('📄 Parsed data:', parsedData);
+                    
+                    if (parsedData && parsedData.content && parsedData.topic) {
+                        console.log('✅ Valid submission data found in:', source.name);
+                        return parsedData;
+                    } else {
+                        console.log('❌ Invalid submission structure in:', source.name);
+                    }
+                } catch (e) {
+                    console.warn(`🚫 JSON 파싱 오류 in ${source.name}:`, e);
+                }
+            }
+        }
+
+        // Try to create mock data if we're in development mode
+        console.log('🔄 No submission data found, checking for development mode...');
+        return createMockSubmissionIfNeeded();
+    }
+
+    function createMockSubmissionIfNeeded() {
+        // Check if we should create mock data (for testing purposes)
+        const shouldCreateMock = window.location.search.includes('mock=true') || 
+                                localStorage.getItem('enableMockData') === 'true';
+        
+        if (shouldCreateMock) {
+            console.log('🧪 Creating mock submission data for testing...');
+            const mockSubmission = {
+                topic: {
+                    title: "환경 보호의 중요성",
+                    description: "기후 변화와 환경 보호에 대한 개인적인 견해를 영어로 표현해보세요.",
+                    difficulty: "2",
+                    type: "guided"
+                },
+                content: "Climate change is one of the most pressing issues of our time. Environmental protection is crucial for ensuring a sustainable future for coming generations. We must take immediate action to reduce carbon emissions and protect our natural resources. Individual actions, combined with government policies and corporate responsibility, can make a significant difference in combating environmental challenges. Everyone has a role to play in protecting our planet for future generations.",
+                wordCount: 65,
+                writingTime: "15:30",
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save mock data to localStorage
+            localStorage.setItem('currentSubmission', JSON.stringify(mockSubmission));
+            return mockSubmission;
+        }
+        
+        return null;
+    }
+
+    function isValidSubmission(submission) {
+        if (!submission) return false;
+        
+        // Check required fields
+        const hasContent = submission.content && typeof submission.content === 'string' && submission.content.trim().length > 0;
+        const hasTopic = submission.topic && typeof submission.topic === 'object';
+        const hasTopicTitle = submission.topic && submission.topic.title && submission.topic.title.trim().length > 0;
+        
+        return hasContent && hasTopic && hasTopicTitle;
+    }
+
+    function showNoDataErrorWithOptions() {
+        document.getElementById('loadingState').classList.add('hidden');
+        
+        // Create custom error modal for no data scenario
+        const errorModalHtml = `
+            <div class="bg-surface rounded-2xl p-8 text-center max-w-md mx-4">
+                <div class="w-16 h-16 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-warning-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-1.938-4.967A9.962 9.962 0 0012 2a9.962 9.962 0 00-8.062 8.033M12 21a9.962 9.962 0 008.062-8.033"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-heading font-semibold text-text-primary mb-2">작문 데이터가 없습니다</h3>
+                <p class="text-text-secondary text-sm mb-6">분석할 작문이 준비되지 않았습니다.<br>새로운 작문을 시작해주세요.</p>
+                <div class="space-y-3">
+                    <a href="topic_selection_writing_interface.html" class="block w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                        새 작문 시작하기
+                    </a>
+                    <a href="writing_practice_dashboard.html" class="block w-full bg-gray-100 hover:bg-gray-200 text-text-primary font-medium py-3 px-4 rounded-lg transition-colors">
+                        대시보드로 돌아가기
+                    </a>
+                    <button onclick="enableMockMode()" class="w-full text-sm text-primary-600 hover:text-primary-700 py-2">
+                        테스트 모드로 체험해보기
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Show custom error state
+        const errorStateElement = document.getElementById('errorState');
+        errorStateElement.innerHTML = errorModalHtml;
+        errorStateElement.classList.remove('hidden');
+    }
+
+    // Global function for mock mode
+    window.enableMockMode = function() {
+        localStorage.setItem('enableMockData', 'true');
+        window.location.reload();
+    }
+
+    function showApiKeyModal() {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('apiKeyModal').classList.remove('hidden');
+        document.getElementById('apiKeyInput').focus();
+    }
+
+    function saveApiKeyAndAnalyze() {
+        const apiKey = document.getElementById('apiKeyInput').value.trim();
+        if (!apiKey) {
+            alert('API 키를 입력해주세요.');
+            return;
+        }
+
+        GeminiAIService.setAPIKey(apiKey);
+        document.getElementById('apiKeyModal').classList.add('hidden');
+        document.getElementById('loadingState').classList.remove('hidden');
+        
+        // Reinitialize service with new API key
+        aiService = new GeminiAIService();
+        performAnalysis();
+    }
+
+    async function performAnalysis() {
+        updateLoadingMessage('GEMINI AI와 연결 중...');
+        updateProgress(10);
+
+        try {
+            updateLoadingMessage('작문 내용을 분석 중...');
+            updateProgress(30);
+
+            const analysis = await aiService.analyzeWriting(currentSubmission);
+            
+            updateLoadingMessage('피드백을 생성 중...');
+            updateProgress(70);
+
+            await displayAnalysisResults(analysis);
+            
+            updateProgress(100);
+            
+            // Save analysis for statistics
+            saveAnalysisToStats(analysis);
+            const correctedEssayToSave = buildCorrectedEssay(currentSubmission.content, analysis.corrections || []);
+            persistHistory(currentSubmission, analysis, correctedEssayToSave);
+            
+            // Hide loading state
+            document.getElementById('loadingState').classList.add('hidden');
+            
+        } catch (error) {
+            console.error('분석 오류:', error);
+            showError(error.message);
+        }
+    }
+
+    function updateLoadingMessage(message) {
+        document.getElementById('loadingMessage').textContent = message;
+    }
+
+    function updateProgress(percentage) {
+        document.getElementById('analysisProgress').style.width = `${percentage}%`;
+    }
+
+    async function displayAnalysisResults(analysis) {
+        const content = generateFeedbackHTML(analysis);
+        document.getElementById('modalContent').innerHTML = content;
+        
+        // Set up dynamic content event listeners
+        setupDynamicEventListeners();
+    }
+
+    function generateFeedbackHTML(analysis) {
+        const raw = analysis.originalSchema || {};
+        const summary = raw.quickSummary || {};
+        const scores = summary.scores || {};
+        const oneLine = summary.oneLineFeedback || '';
+        return `
+            <!-- Overall Grade Section -->
+            <section class="px-6 py-8 text-center bg-gradient-to-r from-secondary-50 to-primary-50">
+                <div class="success-bounce">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-full mb-4">
+                        <span class="text-3xl font-bold text-white">${analysis.overallGrade}</span>
+                    </div>
+                    <h3 class="text-2xl font-heading font-semibold text-text-primary mb-2">${getGradeMessage(analysis.overallGrade)} 🎉</h3>
+                    <p class="text-text-secondary">${oneLine || 'GEMINI AI가 분석한 피드백입니다.'}</p>
+                </div>
+            </section>
+
+            <!-- Detailed Scoring Cards with progress bars and criteria -->
+            <section class="px-6 py-6 space-y-6">
+                <h4 class="text-lg font-heading font-semibold text-text-primary">상세 점수</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Grammar Accuracy -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 bg-error-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <h5 class="font-medium text-text-primary">문법 정확도</h5>
+                        </div>
+                        <div class="flex items-end gap-2 mb-2">
+                            <span class="text-2xl font-bold text-error-600">${analysis.grammarScore}</span>
+                            <span class="text-sm text-text-secondary">/ 100</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-error-500 h-2 rounded-full transition-all duration-500" style="width: ${Math.max(0, Math.min(100, analysis.grammarScore))}%"></div>
+                        </div>
+                        <ul class="mt-3 text-xs text-text-secondary space-y-1">
+                            <li>• 품사/시제/수 일치 오류 감점</li>
+                            <li>• 문장부호/대소문자 오류 감점</li>
+                            <li>• 오류 빈도와 심각도 기반 점수화</li>
+                        </ul>
+                    </div>
+
+                    <!-- Vocabulary Level -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 bg-warning-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                            </div>
+                            <h5 class="font-medium text-text-primary">어휘 수준</h5>
+                        </div>
+                        <div class="flex items-end gap-2 mb-2">
+                            <span class="text-2xl font-bold text-warning-600">${analysis.vocabularyScore}</span>
+                            <span class="text-sm text-text-secondary">/ 100</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-warning-500 h-2 rounded-full transition-all duration-500" style="width: ${Math.max(0, Math.min(100, analysis.vocabularyScore))}%"></div>
+                        </div>
+                        <ul class="mt-3 text-xs text-text-secondary space-y-1">
+                            <li>• 어휘 다양성(Type-Token Ratio)</li>
+                            <li>• 주제 적합성/정확성</li>
+                            <li>• 상위 어휘/관용 표현 사용</li>
+                        </ul>
+                    </div>
+
+                    <!-- Sentence Fluency -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <h5 class="font-medium text-text-primary">문장 유창성</h5>
+                        </div>
+                        <div class="flex items-end gap-2 mb-2">
+                            <span class="text-2xl font-bold text-primary-600">${analysis.fluencyScore}</span>
+                            <span class="text-sm text-text-secondary">/ 100</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-primary-500 h-2 rounded-full transition-all duration-500" style="width: ${Math.max(0, Math.min(100, analysis.fluencyScore))}%"></div>
+                        </div>
+                        <ul class="mt-3 text-xs text-text-secondary space-y-1">
+                            <li>• 문장 길이/구조 다양성</li>
+                            <li>• 연결어 사용 및 문단 전개</li>
+                            <li>• 반복/군더더기 표현 감점</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            ${generateStrengthsSection(analysis.strengths)}
+            ${generateCorrectionsSection(analysis.corrections)}
+            ${generateSuggestionsSection(analysis.suggestions)}
+            ${generateMustFixSection(raw.mustFix)}
+            ${generateBetterExpressionsSection(raw.betterExpressions)}
+            ${generateDetailedAnalysisSection(analysis.detailedFeedback)}
+            ${generateSatisfactionSurveySection()}
+            ${generateActionButtonsSection()}
+        `;
+    }
+
+    function generateMustFixSection(items) {
+        if (!Array.isArray(items) || items.length === 0) return '';
+        return `
+            <section class="px-6 py-6">
+                <h4 class="text-lg font-heading font-semibold text-text-primary mb-3">우선 수정해야 할 것</h4>
+                <div class="space-y-3">
+                    ${items.slice(0,3).map(m => `
+                        <div class="bg-error-50 border border-error-200 rounded-xl p-4">
+                            <div class="text-xs mb-1">우선순위: ${m.priority || '🔴 High'}</div>
+                            <div class="text-sm"><span class="text-text-secondary">원문:</span> ${escapeHtml(m.original || '')}</div>
+                            <div class="text-sm mt-1"><span class="text-text-secondary">수정:</span> ${escapeHtml(m.corrected || '')}</div>
+                            ${m.rule ? `<div class='mt-2 text-xs text-text-secondary'>규칙: ${escapeHtml(m.rule)}</div>` : ''}
+                            ${m.example ? `<div class='mt-1 text-xs text-text-secondary'>예: ${escapeHtml(m.example)}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
+    function generateBetterExpressionsSection(items) {
+        if (!Array.isArray(items) || items.length === 0) return '';
+        return `
+            <section class="px-6 py-6">
+                <h4 class="text-lg font-heading font-semibold text-text-primary mb-3">더 좋은 표현</h4>
+                <div class="space-y-3">
+                    ${items.map(b => `
+                        <div class="bg-warning-50 border border-warning-200 rounded-xl p-4">
+                            <div class="text-sm"><span class="text-text-secondary">현재:</span> ${escapeHtml(b.original || '')}</div>
+                            ${Array.isArray(b.suggestions) ? b.suggestions.slice(0,2).map(s => `
+                                <div class="mt-1 text-sm"><span class="text-text-secondary">개선:</span> ${escapeHtml(s.improved || '')} <span class="text-xs text-text-secondary">(${escapeHtml(s.level || '')})</span></div>
+                                ${s.nuance ? `<div class="text-xs text-text-secondary">뉘앙스: ${escapeHtml(s.nuance)}</div>` : ''}
+                            `).join('') : ''}
+                            ${b.tip ? `<div class="mt-1 text-xs text-text-secondary">Tip: ${escapeHtml(b.tip)}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
+    function generateStrengthsSection(strengths) {
+        if (!strengths || strengths.length === 0) return '';
+
+        return `
+            <section class="px-6 py-6 bg-success-50 border-y border-success-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-success-500 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-heading font-semibold text-success-700">잘한 점들</h4>
+                </div>
+                
+                <div class="space-y-3">
+                    ${strengths.map(strength => `
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-success-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <p class="text-success-700">${strength}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
+    function generateCorrectionsSection(corrections) {
+        if (!corrections || corrections.length === 0) return '';
+
+        return `
+            <section class="px-6 py-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-error-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-heading font-semibold text-text-primary">문법 수정</h4>
+                </div>
+                
+                <div class="space-y-4">
+                    ${corrections.map((correction, index) => `
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <div class="space-y-3">
+                                <div class="text-sm">
+                                    <span class="text-text-secondary">원문:</span>
+                                    <p class="mt-1">${highlightOriginal(correction.original)}</p>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-text-secondary">수정:</span>
+                                    <p class="mt-1">${highlightCorrected(correction.corrected)}</p>
+                                </div>
+                                
+                                <button class="grammar-explanation-toggle flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium" data-target="explanation${index}">
+                                    <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                    설명 보기
+                                </button>
+                                
+                                <div id="explanation${index}" class="disclosure-content h-0 overflow-hidden transition-all duration-300">
+                                    <div class="pt-2 text-sm text-text-secondary bg-primary-50 p-3 rounded-lg">
+                                        ${correction.explanation}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
+    function generateSuggestionsSection(suggestions) {
+        if (!suggestions || suggestions.length === 0) return '';
+
+        return `
+            <section class="px-6 py-6 bg-warning-50 border-y border-warning-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-warning-500 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-heading font-semibold text-warning-700">더 나은 표현 제안</h4>
+                </div>
+                
+                <div class="space-y-4">
+                    ${suggestions.map(suggestion => `
+                        <div class="bg-surface rounded-xl p-4 border border-warning-200">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h6 class="text-sm font-medium text-warning-700 mb-2">현재 표현</h6>
+                                    <p class="text-sm bg-warning-100 p-3 rounded-lg">"${suggestion.current}"</p>
+                                </div>
+                                <div>
+                                    <h6 class="text-sm font-medium text-success-700 mb-2">개선된 표현</h6>
+                                    <p class="text-sm bg-success-100 p-3 rounded-lg">"${suggestion.improved}"</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-sm text-text-secondary">
+                                <strong>개선 이유:</strong> ${suggestion.reason}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
+    function generateDetailedAnalysisSection(detailedFeedback) {
+        if (!detailedFeedback) return '';
+
+        return `
+            <section class="px-6 py-6 bg-primary-50 border-y border-primary-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-heading font-semibold text-primary-700">상세 분석</h4>
+                </div>
+                
+                <div class="space-y-4 text-sm">
+                    ${detailedFeedback.grammarAnalysis ? `
+                        <div>
+                            <h6 class="font-semibold text-primary-700 mb-2">문법 분석</h6>
+                            <p class="text-primary-600">${detailedFeedback.grammarAnalysis}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${detailedFeedback.vocabularyAnalysis ? `
+                        <div>
+                            <h6 class="font-semibold text-primary-700 mb-2">어휘 분석</h6>
+                            <p class="text-primary-600">${detailedFeedback.vocabularyAnalysis}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${detailedFeedback.structureAnalysis ? `
+                        <div>
+                            <h6 class="font-semibold text-primary-700 mb-2">구조 분석</h6>
+                            <p class="text-primary-600">${detailedFeedback.structureAnalysis}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${detailedFeedback.improvementAreas && detailedFeedback.improvementAreas.length > 0 ? `
+                        <div>
+                            <h6 class="font-semibold text-primary-700 mb-2">개선 영역</h6>
+                            <ul class="list-disc list-inside text-primary-600 space-y-1">
+                                ${detailedFeedback.improvementAreas.map(area => `<li>${area}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            </section>
+        `;
+    }
+
+    function generateSatisfactionSurveySection() {
+        return `
+            <section class="px-6 py-6 border-t border-border">
+                <h4 class="text-lg font-heading font-semibold text-text-primary mb-4">피드백이 도움이 되었나요?</h4>
+                
+                <div class="flex items-center gap-4 mb-4">
+                    <button id="thumbsUp" class="flex items-center gap-2 px-4 py-2 bg-success-100 hover:bg-success-200 text-success-700 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                        </svg>
+                        도움됨
+                    </button>
+                    
+                    <button id="thumbsDown" class="flex items-center gap-2 px-4 py-2 bg-error-100 hover:bg-error-200 text-error-700 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2M17 4h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"/>
+                        </svg>
+                        개선 필요
+                    </button>
+                </div>
+                
+                <div id="commentSection" class="hidden">
+                    <textarea id="feedbackComment" placeholder="추가 의견을 남겨주세요 (선택사항)" class="w-full p-3 border border-border rounded-lg resize-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" rows="3"></textarea>
+                    <button id="submitFeedback" class="mt-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors text-sm">
+                        의견 제출
+                    </button>
+                </div>
+            </section>
+        `;
+    }
+
+    function generateActionButtonsSection() {
+        return `
+            <section class="px-6 py-6 bg-gray-50 border-t border-border">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="topic_selection_writing_interface.html" class="flex-1">
+                        <button class="w-full bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                            다시 연습하기
+                        </button>
+                    </a>
+                    
+                    <a href="writing_practice_dashboard.html" class="flex-1">
+                        <button class="w-full bg-surface hover:bg-gray-50 text-text-primary font-medium py-3 px-6 rounded-xl border border-border hover:border-primary-300 transition-colors">
+                            대시보드로
+                        </button>
+                    </a>
+                </div>
+            </section>
+        `;
+    }
+
+    function setupDynamicEventListeners() {
+        // Grammar explanation toggles
+        document.querySelectorAll('.grammar-explanation-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const content = document.getElementById(targetId);
+                const icon = this.querySelector('svg');
+                
+                if (content.classList.contains('h-0')) {
+                    content.style.height = content.scrollHeight + 'px';
+                    content.classList.remove('h-0');
+                    icon.style.transform = 'rotate(180deg)';
+                    this.querySelector('span') ? this.querySelector('span').textContent = '설명 숨기기' : null;
+                } else {
+                    content.style.height = '0px';
+                    content.classList.add('h-0');
+                    icon.style.transform = 'rotate(0deg)';
+                    this.querySelector('span') ? this.querySelector('span').textContent = '설명 보기' : null;
+                }
+            });
+        });
+        
+        // Satisfaction survey
+        document.getElementById('thumbsUp')?.addEventListener('click', function() {
+            handleFeedback('positive');
+        });
+        
+        document.getElementById('thumbsDown')?.addEventListener('click', function() {
+            handleFeedback('negative');
+            document.getElementById('commentSection').classList.remove('hidden');
+        });
+        
+        document.getElementById('submitFeedback')?.addEventListener('click', function() {
+            submitUserFeedback();
+        });
+    }
+
+    function highlightOriginal(text) {
+        // Simple highlighting - you can make this more sophisticated
+        return text.replace(/(\w+)/g, '<span class="bg-error-100 text-error-700 line-through px-1 rounded">$1</span>');
+    }
+
+    function highlightCorrected(text) {
+        // Simple highlighting - you can make this more sophisticated
+        return text.replace(/(\w+)/g, '<span class="bg-success-100 text-success-700 px-1 rounded font-medium">$1</span>');
+    }
+
+    function getGradeMessage(grade) {
+        const messages = {
+            'A+': '탁월한 작문입니다',
+            'A': '매우 훌륭한 작문이에요',
+            'B+': '훌륭한 작문이에요',
+            'B': '좋은 작문입니다',
+            'C+': '양호한 작문이에요',
+            'C': '보통 수준의 작문입니다',
+            'D+': '개선이 필요한 작문이에요',
+            'D': '많은 개선이 필요합니다',
+            'F': '다시 도전해보세요'
+        };
+        return messages[grade] || '작문 평가 완료';
+    }
+
+    function handleFeedback(type) {
+        document.getElementById('thumbsUp').classList.toggle('bg-success-200', type === 'positive');
+        document.getElementById('thumbsDown').classList.toggle('bg-error-200', type === 'negative');
+        localStorage.setItem('feedbackSatisfaction', type);
+    }
+
+    function submitUserFeedback() {
+        const comment = document.getElementById('feedbackComment').value;
+        const feedback = {
+            satisfaction: localStorage.getItem('feedbackSatisfaction'),
+            comment: comment,
+            timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('userFeedback', JSON.stringify(feedback));
+        alert('피드백이 제출되었습니다. 감사합니다!');
+        document.getElementById('commentSection').classList.add('hidden');
+    }
+
+    function saveAnalysisToStats(analysis) {
+        try {
+            let stats = JSON.parse(localStorage.getItem('writingStats')) || {};
+            
+            stats.totalCompositions = (stats.totalCompositions || 0) + 1;
+            stats.lastFeedback = analysis;
+            stats.averageGrammar = calculateNewAverage(stats.averageGrammar, analysis.grammarScore);
+            stats.averageVocabulary = calculateNewAverage(stats.averageVocabulary, analysis.vocabularyScore);
+            stats.averageFluency = calculateNewAverage(stats.averageFluency, analysis.fluencyScore);
+            stats.lastActivity = new Date().toISOString();
+            
+            // Add to recent activities
+            if (!stats.recentActivities) stats.recentActivities = [];
+            stats.recentActivities.unshift({
+                title: currentSubmission.topic.title,
+                score: Math.round((analysis.grammarScore + analysis.vocabularyScore + analysis.fluencyScore) / 3),
+                timeAgo: '방금 전',
+                timestamp: new Date().toISOString()
+            });
+            
+            // Keep only last 10 activities
+            stats.recentActivities = stats.recentActivities.slice(0, 10);
+            
+            localStorage.setItem('writingStats', JSON.stringify(stats));
+        } catch (error) {
+            console.error('통계 저장 오류:', error);
+        }
+    }
+
+    // Persist full history for later review
+    function persistHistory(submission, analysis, correctedEssay) {
+        try {
+            const history = JSON.parse(localStorage.getItem('writingHistory')) || [];
+            const liteAnalysis = minimizeAnalysis(analysis);
+            history.unshift({
+                id: Date.now(),
+                submission,
+                analysis: liteAnalysis,
+                correctedEssay,
+                savedAt: new Date().toISOString()
+            });
+            // Keep last 50 entries
+            localStorage.setItem('writingHistory', JSON.stringify(history.slice(0, 50)));
+        } catch (e) {
+            console.error('히스토리 저장 오류:', e);
+        }
+    }
+
+    function minimizeAnalysis(analysis) {
+        try {
+            const summary = {
+                overallGrade: analysis.overallGrade,
+                grammarScore: analysis.grammarScore,
+                vocabularyScore: analysis.vocabularyScore,
+                fluencyScore: analysis.fluencyScore,
+                strengths: Array.isArray(analysis.strengths) ? analysis.strengths.slice(0, 5) : [],
+                // Save full corrections and suggestions for later review
+                corrections: Array.isArray(analysis.corrections) ? analysis.corrections.map(c => ({
+                    original: c.original,
+                    corrected: c.corrected,
+                    explanation: c.explanation
+                })) : [],
+                suggestions: Array.isArray(analysis.suggestions) ? analysis.suggestions.map(s => ({
+                    current: s.current,
+                    improved: s.improved,
+                    reason: s.reason
+                })) : [],
+                detailedFeedback: {
+                    grammarAnalysis: truncate(analysis?.detailedFeedback?.grammarAnalysis, 300),
+                    vocabularyAnalysis: truncate(analysis?.detailedFeedback?.vocabularyAnalysis, 300),
+                    structureAnalysis: truncate(analysis?.detailedFeedback?.structureAnalysis, 300)
+                },
+                metadata: analysis.metadata
+            };
+            return summary;
+        } catch (_) {
+            return analysis;
+        }
+    }
+
+    function truncate(text, maxLen) {
+        if (!text || typeof text !== 'string') return '';
+        return text.length > maxLen ? text.slice(0, maxLen) + '…' : text;
+    }
+
+    // Build a full corrected essay based on AI corrections
+    function buildCorrectedEssay(originalText, corrections) {
+        try {
+            if (!Array.isArray(corrections) || corrections.length === 0) return originalText;
+            let result = originalText;
+            // Apply replacements safely by processing longer originals first
+            const sorted = corrections
+                .filter(c => c && c.original && c.corrected)
+                .slice()
+                .sort((a, b) => (b.original.length || 0) - (a.original.length || 0));
+            sorted.forEach(c => {
+                try {
+                    const pattern = new RegExp(escapeRegExp(c.original), 'g');
+                    result = result.replace(pattern, c.corrected);
+                } catch (e) {
+                    // Fallback simple replace
+                    result = result.split(c.original).join(c.corrected);
+                }
+            });
+            return result;
+        } catch (e) {
+            console.error('교정문 생성 오류:', e);
+            return originalText;
+        }
+    }
+
+    function escapeRegExp(string) {
+        return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Safely escape HTML to prevent injection when rendering model text
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function calculateNewAverage(currentAverage, newScore) {
+        if (!currentAverage) return newScore;
+        return Math.round((currentAverage + newScore) / 2);
+    }
+
+    function showError(message) {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorState').classList.remove('hidden');
+    }
+
+    function showErrorAndReturn() {
+        window.history.back();
+    }
+
+    async function retryAnalysis() {
+        document.getElementById('errorState').classList.add('hidden');
+        document.getElementById('loadingState').classList.remove('hidden');
+        updateProgress(0);
+        await performAnalysis();
+    }
+
+    function closeModal() {
+        document.getElementById('modalBackdrop').style.opacity = '0';
+        document.getElementById('feedbackModal').style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            window.history.back();
+        }, 300);
+    }
+</script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

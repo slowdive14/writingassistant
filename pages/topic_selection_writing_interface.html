@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 영어 작문 트레이너 - 주제 선택 및 작문</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script src="../public/config.js"></script>
+<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Faienglish1590back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.8"></script>
+</head>
+<body class="bg-background font-body text-text-primary min-h-screen">
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-surface border-b border-border shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Back Button & Logo -->
+                <div class="flex items-center space-x-3">
+                    <a href="writing_practice_dashboard.html" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-heading font-semibold text-text-primary">AI 영어 작문</h1>
+                </div>
+                
+                <!-- User Menu -->
+                <button class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Topic Selection Section (hidden - always start free writing) -->
+        <section id="topicSelection" class="space-y-6 hidden">
+            <!-- Page Title -->
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-heading font-semibold text-text-primary">주제를 선택하세요</h2>
+                <p class="text-text-secondary">가이드 주제를 선택하거나 자유 주제로 작문해보세요</p>
+            </div>
+
+            <!-- Guided Topics Section (removed) -->
+            <div class="space-y-4 hidden">
+                <h3 class="text-lg font-heading font-semibold text-text-primary flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    가이드 주제
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Topic Card 1 -->
+                    <div class="topic-card bg-surface border border-border rounded-2xl p-6 cursor-pointer hover:shadow-md hover:border-primary-200 transition-all duration-200 group" data-topic="환경 보호의 중요성" data-description="기후 변화와 환경 보호에 대한 개인적인 견해를 영어로 표현해보세요." data-difficulty="2">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <h4 class="font-heading font-semibold text-text-primary group-hover:text-primary-600 transition-colors">환경 보호의 중요성</h4>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-sm text-text-secondary">기후 변화와 환경 보호에 대한 개인적인 견해를 영어로 표현해보세요.</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-accent-600 bg-accent-100 px-2 py-1 rounded-full">중급</span>
+                                <span class="text-xs text-text-secondary">예상 시간: 15-20분</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic Card 2 -->
+                    <div class="topic-card bg-surface border border-border rounded-2xl p-6 cursor-pointer hover:shadow-md hover:border-primary-200 transition-all duration-200 group" data-topic="기술이 우리 삶에 미치는 영향" data-description="현대 기술의 긍정적, 부정적 영향에 대해 균형잡힌 시각으로 작성해보세요." data-difficulty="3">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <h4 class="font-heading font-semibold text-text-primary group-hover:text-primary-600 transition-colors">기술이 우리 삶에 미치는 영향</h4>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-sm text-text-secondary">현대 기술의 긍정적, 부정적 영향에 대해 균형잡힌 시각으로 작성해보세요.</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-error-600 bg-error-100 px-2 py-1 rounded-full">고급</span>
+                                <span class="text-xs text-text-secondary">예상 시간: 20-25분</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic Card 3 -->
+                    <div class="topic-card bg-surface border border-border rounded-2xl p-6 cursor-pointer hover:shadow-md hover:border-primary-200 transition-all duration-200 group" data-topic="나의 취미와 여가 활동" data-description="개인적인 취미나 여가 활동에 대해 자세히 설명하고 그 의미를 나눠보세요." data-difficulty="1">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <h4 class="font-heading font-semibold text-text-primary group-hover:text-primary-600 transition-colors">나의 취미와 여가 활동</h4>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-sm text-text-secondary">개인적인 취미나 여가 활동에 대해 자세히 설명하고 그 의미를 나눠보세요.</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-secondary-600 bg-secondary-100 px-2 py-1 rounded-full">초급</span>
+                                <span class="text-xs text-text-secondary">예상 시간: 10-15분</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic Card 4 -->
+                    <div class="topic-card bg-surface border border-border rounded-2xl p-6 cursor-pointer hover:shadow-md hover:border-primary-200 transition-all duration-200 group" data-topic="미래의 직업과 꿈" data-description="미래에 하고 싶은 일이나 꿈에 대해 구체적인 계획과 함께 작성해보세요." data-difficulty="2">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <h4 class="font-heading font-semibold text-text-primary group-hover:text-primary-600 transition-colors">미래의 직업과 꿈</h4>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-sm text-text-secondary">미래에 하고 싶은 일이나 꿈에 대해 구체적인 계획과 함께 작성해보세요.</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-accent-600 bg-accent-100 px-2 py-1 rounded-full">중급</span>
+                                <span class="text-xs text-text-secondary">예상 시간: 15-20분</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Free Writing Section (title input removed) -->
+            <div class="space-y-4 hidden">
+                <h3 class="text-lg font-heading font-semibold text-text-primary flex items-center gap-2">
+                    <svg class="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                    자유 주제
+                </h3>
+                
+                <div class="bg-surface border border-border rounded-2xl p-6">
+                    <div class="space-y-4">
+                        <div class="text-sm text-text-secondary">자유 주제로 바로 작성이 시작됩니다.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Writing Interface Section (Hidden by default) -->
+        <section id="writingInterface" class="space-y-6 hidden">
+            <!-- Selected Topic Display -->
+            <div class="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-6 border border-border-light">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="space-y-2">
+                        <h3 id="selectedTopicTitle" class="text-xl font-heading font-semibold text-text-primary"></h3>
+                        <p id="selectedTopicDescription" class="text-text-secondary"></p>
+                    </div>
+                    <!-- Topic change hidden in free-only mode -->
+                    <button id="changeTopicBtn" class="hidden text-primary-600 hover:text-primary-700 text-sm font-medium whitespace-nowrap">주제 변경</button>
+                </div>
+            </div>
+
+            <!-- Writing Area -->
+            <div class="bg-surface rounded-2xl border border-border shadow-sm">
+                <div class="p-6 space-y-4">
+                    <!-- Writing Textarea -->
+                    <div class="space-y-2">
+                        <label for="writingArea" class="block text-sm font-medium text-text-primary">영어 작문을 시작하세요</label>
+                        <textarea id="writingArea" placeholder="Start writing your composition in English here..." class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none font-mono text-base leading-relaxed" style="min-height: 250px;" rows="10"></textarea>
+                    </div>
+
+                    <!-- Writing Statistics -->
+                    <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-border-light">
+                        <div class="flex items-center gap-6">
+                            <!-- Word Counter -->
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span class="text-sm">
+                                    단어: <span id="wordCount" class="font-semibold text-text-primary">0</span>
+                                    <span class="text-text-secondary">/ 최소 50</span>
+                                </span>
+                            </div>
+
+                            <!-- Character Counter -->
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2"/>
+                                </svg>
+                                <span class="text-sm text-text-secondary">
+                                    글자: <span id="charCount">0</span>
+                                </span>
+                            </div>
+
+                            <!-- Writing Timer -->
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="text-sm text-text-secondary">
+                                    시간: <span id="writingTimer" class="font-mono">00:00</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Auto-save Indicator -->
+                        <div id="autoSaveIndicator" class="flex items-center gap-2 text-xs text-text-secondary opacity-0 transition-opacity">
+                            <svg class="w-3 h-3 text-secondary-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            <span>자동 저장됨</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button id="submitWriting" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-500 flex items-center justify-center gap-2" disabled>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>AI 분석 받기</span>
+                        </button>
+                        <p class="text-xs text-text-secondary text-center mt-2">
+                            최소 50단어 이상 작성해야 제출할 수 있습니다
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-surface rounded-2xl p-8 text-center max-w-sm mx-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">AI 분석 중...</h3>
+            <p class="text-sm text-text-secondary">작문을 분석하고 있습니다. 잠시만 기다려주세요.</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let writingTimer = null;
+        let startTime = null;
+        let autoSaveTimer = null;
+        let currentTopic = null;
+        let bypassUnloadPrompt = false; // set true on intentional navigation (e.g., submit)
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeInterface();
+            setupEventListeners();
+            // Always start with free topic immediately
+            currentTopic = {
+                title: '자유 주제',
+                description: '자유 주제로 선택한 작문입니다.',
+                difficulty: 'custom',
+                type: 'free'
+            };
+            showWritingInterface();
+            // If navigation requests a new composition, clear any saved draft
+            const isNew = new URLSearchParams(window.location.search).get('new') === '1';
+            if (isNew) {
+                localStorage.removeItem('currentWritingContent');
+                localStorage.removeItem('currentWritingTopic');
+            }
+            loadSavedContent();
+        });
+
+        function initializeInterface() {
+            // Initialize topic selection
+            // No-op: free-only mode
+        }
+
+        function setupEventListeners() {
+            // Topic card selection
+            // No guided topics in free-only mode
+
+            // Free writing button
+            // Start button removed in free-only mode
+
+            // Change topic button
+            document.getElementById('changeTopicBtn').addEventListener('click', function() {
+                showTopicSelection();
+            });
+
+            // Writing area events
+            const writingArea = document.getElementById('writingArea');
+            writingArea.addEventListener('input', function() {
+                updateWordCount();
+                updateCharCount();
+                scheduleAutoSave();
+            });
+
+            writingArea.addEventListener('focus', function() {
+                startWritingTimer();
+            });
+
+            // Submit button
+            document.getElementById('submitWriting').addEventListener('click', function() {
+                submitWriting();
+            });
+        }
+
+        function selectGuidedTopic(card) {
+            const topic = card.dataset.topic;
+            const description = card.dataset.description;
+            const difficulty = card.dataset.difficulty;
+
+            currentTopic = {
+                title: topic,
+                description: description,
+                difficulty: difficulty,
+                type: 'guided'
+            };
+
+            showWritingInterface();
+        }
+
+        function selectCustomTopic(topic) {
+            currentTopic = {
+                title: topic,
+                description: '자유 주제로 선택한 작문입니다.',
+                difficulty: 'custom',
+                type: 'free'
+            };
+
+            showWritingInterface();
+        }
+
+        function showWritingInterface() {
+            // Hide topic selection
+            document.getElementById('topicSelection').classList.add('hidden');
+            
+            // Show writing interface
+            document.getElementById('writingInterface').classList.remove('hidden');
+
+            // Update topic display
+            document.getElementById('selectedTopicTitle').textContent = currentTopic.title;
+            document.getElementById('selectedTopicDescription').textContent = currentTopic.description;
+
+            // Focus on writing area
+            setTimeout(() => {
+                document.getElementById('writingArea').focus();
+            }, 300);
+
+            // Save current topic
+            localStorage.setItem('currentWritingTopic', JSON.stringify(currentTopic));
+        }
+
+        function showTopicSelection() {
+            // Show topic selection
+            document.getElementById('topicSelection').classList.remove('hidden');
+            
+            // Hide writing interface
+            document.getElementById('writingInterface').classList.add('hidden');
+
+            // Reset writing area
+            document.getElementById('writingArea').value = '';
+            updateWordCount();
+            updateCharCount();
+            stopWritingTimer();
+
+            // Clear saved content
+            localStorage.removeItem('currentWritingContent');
+            localStorage.removeItem('currentWritingTopic');
+        }
+
+        function updateWordCount() {
+            const writingArea = document.getElementById('writingArea');
+            const text = writingArea.value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            
+            const wordCountElement = document.getElementById('wordCount');
+            const submitButton = document.getElementById('submitWriting');
+            
+            wordCountElement.textContent = words;
+            
+            // Update word count color based on minimum requirement
+            if (words >= 50) {
+                wordCountElement.className = 'font-semibold text-secondary-600';
+                submitButton.disabled = false;
+            } else if (words >= 30) {
+                wordCountElement.className = 'font-semibold text-accent-600';
+                submitButton.disabled = true;
+            } else {
+                wordCountElement.className = 'font-semibold text-error-600';
+                submitButton.disabled = true;
+            }
+        }
+
+        function updateCharCount() {
+            const writingArea = document.getElementById('writingArea');
+            const charCount = writingArea.value.length;
+            document.getElementById('charCount').textContent = charCount;
+        }
+
+        function startWritingTimer() {
+            if (!startTime) {
+                startTime = Date.now();
+                writingTimer = setInterval(updateTimer, 1000);
+            }
+        }
+
+        function stopWritingTimer() {
+            if (writingTimer) {
+                clearInterval(writingTimer);
+                writingTimer = null;
+                startTime = null;
+                document.getElementById('writingTimer').textContent = '00:00';
+            }
+        }
+
+        function updateTimer() {
+            if (startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('writingTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function scheduleAutoSave() {
+            if (autoSaveTimer) {
+                clearTimeout(autoSaveTimer);
+            }
+            
+            autoSaveTimer = setTimeout(() => {
+                saveContent();
+                showAutoSaveIndicator();
+            }, 2000);
+        }
+
+        function saveContent() {
+            const content = document.getElementById('writingArea').value;
+            localStorage.setItem('currentWritingContent', content);
+        }
+
+        function loadSavedContent() {
+            const savedContent = localStorage.getItem('currentWritingContent');
+            const savedTopic = localStorage.getItem('currentWritingTopic');
+            
+            if (savedContent && savedTopic) {
+                try {
+                    currentTopic = JSON.parse(savedTopic);
+                    document.getElementById('writingArea').value = savedContent;
+                    showWritingInterface();
+                    updateWordCount();
+                    updateCharCount();
+                } catch (error) {
+                    console.error('Error loading saved content:', error);
+                }
+            }
+        }
+
+        function showAutoSaveIndicator() {
+            const indicator = document.getElementById('autoSaveIndicator');
+            indicator.classList.remove('opacity-0');
+            indicator.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                indicator.classList.remove('opacity-100');
+                indicator.classList.add('opacity-0');
+            }, 2000);
+        }
+
+        function submitWriting() {
+            const writingContent = document.getElementById('writingArea').value.trim();
+            const wordCount = writingContent.split(/\s+/).length;
+            
+            if (wordCount < 50) {
+                alert('최소 50단어 이상 작성해주세요.');
+                return;
+            }
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+
+            // Prepare submission data
+            const submissionData = {
+                topic: currentTopic,
+                content: writingContent,
+                wordCount: wordCount,
+                writingTime: document.getElementById('writingTimer').textContent,
+                timestamp: new Date().toISOString()
+            };
+
+            // Save to localStorage for analysis
+            localStorage.setItem('currentSubmission', JSON.stringify(submissionData));
+
+            // Simulate AI analysis delay
+            setTimeout(() => {
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                
+                // Clear saved content
+                localStorage.removeItem('currentWritingContent');
+                localStorage.removeItem('currentWritingTopic');
+                
+                // Redirect to feedback modal
+                bypassUnloadPrompt = true; // avoid "leave site" prompt on intentional navigation
+                window.location.href = 'ai_feedback_analysis_modal.html';
+            }, 3000);
+        }
+
+        // Prevent accidental page refresh
+        window.addEventListener('beforeunload', function(e) {
+            const writingArea = document.getElementById('writingArea');
+            if (!bypassUnloadPrompt && writingArea && writingArea.value.trim().length > 0) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Auto-save on page visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                saveContent();
+            }
+        });
+    </script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

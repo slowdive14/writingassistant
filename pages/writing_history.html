@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>작문 히스토리</title>
+    <link rel="stylesheet" href="../css/main.css" />
+</head>
+<body class="bg-background font-body text-text-primary min-h-screen">
+    <header class="sticky top-0 z-50 bg-surface border-b border-border shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <h1 class="text-lg font-heading font-semibold">작문 히스토리</h1>
+            <div class="flex items-center gap-3">
+                <button id="clearHistory" class="text-sm bg-error-100 hover:bg-error-200 text-error-700 border border-error-200 px-3 py-1.5 rounded-lg">전체 삭제</button>
+                <a href="writing_practice_dashboard.html" class="text-sm text-primary-600 underline">대시보드</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div id="emptyState" class="hidden text-center text-text-secondary py-12">
+            저장된 히스토리가 없습니다. 작문 후 AI 분석을 받아보세요.
+        </div>
+
+        <div id="historyList" class="space-y-4"></div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('historyList');
+            const empty = document.getElementById('emptyState');
+            const items = JSON.parse(localStorage.getItem('writingHistory') || '[]');
+
+            if (!items.length) {
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            items.forEach((entry, idx) => {
+                const { submission, analysis, savedAt } = entry;
+                const card = document.createElement('div');
+                card.className = 'bg-surface rounded-2xl border border-border shadow-sm p-6';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <div class="text-sm text-text-secondary">${new Date(savedAt).toLocaleString()}</div>
+                            <h2 class="text-xl font-heading font-semibold text-text-primary mt-1">${submission.topic?.title || '자유 주제'}</h2>
+                            <div class="text-xs text-text-secondary">단어 수: ${submission.wordCount} · 작성 시간: ${submission.writingTime}</div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 text-center min-w-[220px]">
+                            <div class="bg-gray-50 rounded-xl p-3">
+                                <div class="text-xs text-text-secondary mb-1">문법</div>
+                                <div class="text-lg font-bold text-error-600">${analysis.grammarScore}</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-3">
+                                <div class="text-xs text-text-secondary mb-1">어휘</div>
+                                <div class="text-lg font-bold text-warning-600">${analysis.vocabularyScore}</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-3">
+                                <div class="text-xs text-text-secondary mb-1">유창성</div>
+                                <div class="text-lg font-bold text-primary-600">${analysis.fluencyScore}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center justify-end">
+                        <button class="delete-entry text-xs bg-error-100 hover:bg-error-200 text-error-700 border border-error-200 px-2.5 py-1 rounded" data-id="${entry.id}">삭제</button>
+                    </div>
+                    <details class="mt-4">
+                        <summary class="text-sm text-primary-600 cursor-pointer">원문 보기</summary>
+                        <pre class="mt-2 p-3 bg-gray-50 rounded-xl overflow-x-auto text-sm whitespace-pre-wrap">${escapeHtml(submission.content)}</pre>
+                    </details>
+                    <details class="mt-3">
+                        <summary class="text-sm text-primary-600 cursor-pointer">AI 피드백 요약</summary>
+                        <div class="mt-2 text-sm text-text-secondary">등급: <span class="font-medium text-text-primary">${analysis.overallGrade}</span></div>
+                        ${renderList('잘한 점', analysis.strengths)}
+                        ${renderText('문법 분석', analysis?.detailedFeedback?.grammarAnalysis)}
+                        ${renderText('어휘 분석', analysis?.detailedFeedback?.vocabularyAnalysis)}
+                        ${renderText('구조 분석', analysis?.detailedFeedback?.structureAnalysis)}
+                    </details>
+                `;
+                container.appendChild(card);
+
+                // individual delete handler
+                card.querySelector('.delete-entry').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (!confirm('이 항목을 삭제할까요?')) return;
+                    const id = entry.id;
+                    const history = JSON.parse(localStorage.getItem('writingHistory') || '[]').filter(it => it.id !== id);
+                    localStorage.setItem('writingHistory', JSON.stringify(history));
+                    card.remove();
+                    if (!history.length) {
+                        empty.classList.remove('hidden');
+                    }
+                });
+            });
+
+            document.getElementById('clearHistory').addEventListener('click', () => {
+                if (confirm('히스토리를 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) {
+                    localStorage.removeItem('writingHistory');
+                    location.reload();
+                }
+            });
+        });
+
+        function renderList(title, items) {
+            if (!items || !items.length) return '';
+            return `
+                <div class="mt-2">
+                    <div class="text-sm font-medium text-text-primary mb-1">${title}</div>
+                    <ul class="list-disc list-inside text-sm text-text-secondary space-y-1">
+                        ${items.map(it => `<li>${escapeHtml(it)}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function renderText(title, text) {
+            if (!text) return '';
+            return `
+                <div class="mt-2">
+                    <div class="text-sm font-medium text-text-primary mb-1">${title}</div>
+                    <div class="text-sm text-text-secondary">${escapeHtml(text)}</div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
+
+
