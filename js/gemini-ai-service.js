@@ -373,11 +373,17 @@ Please provide a detailed analysis in the following JSON format:
                 : [];
 
             const grammarAnalysis = (raw.learningPoints?.grammarPatterns || [])
-                .map(p => `• ${p.pattern} → ${p.correct} (ex: ${p.practice})`).join('\n');
+                .map(p => `• ${p.pattern} → ${p.correct}\n  예시: ${p.practice}`).join('\n\n');
             const vocabularyAnalysis = (raw.learningPoints?.vocabularyTips || [])
-                .map(v => `• ${v.word}: ${v.usage}${v.collocations ? ` | collocations: ${v.collocations.join(', ')}` : ''}`).join('\n');
+                .map(v => {
+                    let result = `• ${v.word}: ${v.usage}`;
+                    if (v.collocations && v.collocations.length > 0) {
+                        result += `\n  연어표현: ${v.collocations.join(', ')}`;
+                    }
+                    return result;
+                }).join('\n\n');
             const structureAnalysis = summary.oneLineFeedback || '';
-            const improvementAreas = [raw.nextSteps?.focusArea, ...(raw.nextSteps?.exercises || [])].filter(Boolean);
+            const improvementAreas = [raw.nextSteps?.focusArea, ...(raw.nextSteps?.exercises || [])].filter(Boolean).map(area => `• ${area}`).join('\n');
 
             const normalized = {
                 overallGrade,
