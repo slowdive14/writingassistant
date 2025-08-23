@@ -168,7 +168,7 @@ Please provide a detailed analysis in the following JSON format:
                         temperature: 0.3,
                         topK: 1,
                         topP: 1,
-                        maxOutputTokens: 4096,
+                        maxOutputTokens: 8000,
                         responseMimeType: "application/json"
                     },
                     safetySettings: [
