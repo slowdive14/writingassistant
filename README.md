@@ -1,35 +1,56 @@
-# HTML
+# AI English Writing Trainer
 
-A modern HTML project utilizing Tailwind CSS for building responsive web applications with minimal setup.
+A Korean-focused English writing trainer powered by Google's Gemini AI. Provides comprehensive writing analysis and feedback specifically designed for Korean learners.
 
 ## 🚀 Features
 
-- **HTML5** - Modern HTML structure with best practices
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **Custom Components** - Pre-built component classes for buttons and containers
-- **NPM Scripts** - Easy-to-use commands for development and building
-- **Responsive Design** - Mobile-first approach for all screen sizes
+- **AI-Powered Analysis** - Google Gemini AI provides detailed writing feedback
+- **Korean-Focused** - Specialized for common Korean learner mistakes (articles, prepositions, Konglish)
+- **Comprehensive Feedback** - Grammar, vocabulary, structure, and fluency scoring
+- **Interactive Writing Interface** - Topic selection and guided writing practice
+- **Progress Tracking** - Writing history and improvement analytics
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
 
 ## 📋 Prerequisites
 
-- Node.js (v12.x or higher)
+- Node.js (v18.x or higher)
 - npm or yarn
+- Google Gemini API key
 
 ## 🛠️ Installation
 
-1. Install dependencies:
+1. Clone the repository:
 ```bash
-npm install
-# or
-yarn install
+git clone https://github.com/slowdive14/writingassistant.git
+cd writingassistant
 ```
 
-2. Start the development server:
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up your API key:
+```bash
+# Create .env file
+echo "GEMINI_API_KEY=your_api_key_here" > .env
+
+# Or copy and edit the config template
+cp public/config-template.js public/config.js
+# Edit config.js with your API key
+```
+
+4. Start development:
 ```bash
 npm run dev
-# or
-yarn dev
+npm run serve  # In another terminal for API proxy
 ```
+
+5. Open http://localhost:3000
+
+## 🌐 Live Demo
+
+Visit: **https://slowdive14.github.io/writingassistant/**
 
 ## 📁 Project Structure
 
