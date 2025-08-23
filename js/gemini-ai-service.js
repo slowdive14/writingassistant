@@ -383,7 +383,7 @@ Please provide a detailed analysis in the following JSON format:
                     return result;
                 }).join('\n\n');
             const structureAnalysis = summary.oneLineFeedback || '';
-            const improvementAreas = [raw.nextSteps?.focusArea, ...(raw.nextSteps?.exercises || [])].filter(Boolean).map(area => `• ${area}`).join('\n');
+            const improvementAreas = [raw.nextSteps?.focusArea, ...(raw.nextSteps?.exercises || [])].filter(Boolean);
 
             const normalized = {
                 overallGrade,

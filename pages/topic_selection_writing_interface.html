@@ -212,7 +212,7 @@
                                 </svg>
                                 <span class="text-sm">
                                     단어: <span id="wordCount" class="font-semibold text-text-primary">0</span>
-                                    <span class="text-text-secondary">/ 최소 50</span>
+                                    <span class="text-text-secondary">/ 최소 30</span>
                                 </span>
                             </div>
 
@@ -255,7 +255,7 @@
                             <span>AI 분석 받기</span>
                         </button>
                         <p class="text-xs text-text-secondary text-center mt-2">
-                            최소 50단어 이상 작성해야 제출할 수 있습니다
+                            최소 30단어 이상 작성해야 제출할 수 있습니다
                         </p>
                     </div>
                 </div>
@@ -411,10 +411,10 @@
             wordCountElement.textContent = words;
             
             // Update word count color based on minimum requirement
-            if (words >= 50) {
+            if (words >= 30) {
                 wordCountElement.className = 'font-semibold text-secondary-600';
                 submitButton.disabled = false;
-            } else if (words >= 30) {
+            } else if (words >= 20) {
                 wordCountElement.className = 'font-semibold text-accent-600';
                 submitButton.disabled = true;
             } else {
@@ -503,8 +503,8 @@
             const writingContent = document.getElementById('writingArea').value.trim();
             const wordCount = writingContent.split(/\s+/).length;
             
-            if (wordCount < 50) {
-                alert('최소 50단어 이상 작성해주세요.');
+            if (wordCount < 30) {
+                alert('최소 30단어 이상 작성해주세요.');
                 return;
             }
 
