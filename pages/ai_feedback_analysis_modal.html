@@ -481,8 +481,6 @@
             ${generateCorrectionsSection(analysis.corrections)}
             ${generateSuggestionsSection(analysis.suggestions)}
             ${generateMustFixSection(raw.mustFix)}
-            ${generateBetterExpressionsSection(raw.betterExpressions)}
-            ${generateDetailedAnalysisSection(analysis.detailedFeedback)}
             ${generateSatisfactionSurveySection()}
             ${generateActionButtonsSection()}
         `;
@@ -512,14 +510,14 @@
         if (!Array.isArray(items) || items.length === 0) return '';
         return `
             <section class="px-6 py-6">
-                <h4 class="text-lg font-heading font-semibold text-text-primary mb-3">더 좋은 표현</h4>
+                <h4 class="text-lg font-heading font-semibold text-text-primary mb-3">미국식 자연스러운 표현</h4>
                 <div class="space-y-3">
                     ${items.map(b => `
                         <div class="bg-warning-50 border border-warning-200 rounded-xl p-4">
-                            <div class="text-sm"><span class="text-text-secondary">현재:</span> ${escapeHtml(b.original || '')}</div>
+                            <div class="text-sm"><span class="text-text-secondary">원문:</span> ${escapeHtml(b.original || '')}</div>
                             ${Array.isArray(b.suggestions) ? b.suggestions.slice(0,2).map(s => `
-                                <div class="mt-1 text-sm"><span class="text-text-secondary">개선:</span> ${escapeHtml(s.improved || '')} <span class="text-xs text-text-secondary">(${escapeHtml(s.level || '')})</span></div>
-                                ${s.nuance ? `<div class="text-xs text-text-secondary">뉘앙스: ${escapeHtml(s.nuance)}</div>` : ''}
+                                <div class="mt-1 text-sm"><span class="text-text-secondary">자연스러운 표현:</span> ${escapeHtml(s.improved || '')} <span class="text-xs text-text-secondary">(${escapeHtml(s.level || '')})</span></div>
+                                ${s.nuance ? `<div class="mt-2 ml-4 pl-3 border-l border-warning-200 text-xs text-text-secondary">${escapeHtml(s.nuance)}</div>` : ''}
                             `).join('') : ''}
                             ${b.tip ? `<div class="mt-1 text-xs text-text-secondary">Tip: ${escapeHtml(b.tip)}</div>` : ''}
                         </div>
@@ -641,54 +639,7 @@
         `;
     }
 
-    function generateDetailedAnalysisSection(detailedFeedback) {
-        if (!detailedFeedback) return '';
-
-        return `
-            <section class="px-6 py-6 bg-primary-50 border-y border-primary-100">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                    </div>
-                    <h4 class="text-lg font-heading font-semibold text-primary-700">상세 분석</h4>
-                </div>
-                
-                <div class="space-y-4 text-sm">
-                    ${detailedFeedback.grammarAnalysis ? `
-                        <div>
-                            <h6 class="font-semibold text-primary-700 mb-2">문법 분석</h6>
-                            <p class="text-primary-600">${detailedFeedback.grammarAnalysis}</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${detailedFeedback.vocabularyAnalysis ? `
-                        <div>
-                            <h6 class="font-semibold text-primary-700 mb-2">어휘 분석</h6>
-                            <p class="text-primary-600">${detailedFeedback.vocabularyAnalysis}</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${detailedFeedback.structureAnalysis ? `
-                        <div>
-                            <h6 class="font-semibold text-primary-700 mb-2">구조 분석</h6>
-                            <p class="text-primary-600">${detailedFeedback.structureAnalysis}</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${detailedFeedback.improvementAreas && detailedFeedback.improvementAreas.length > 0 ? `
-                        <div>
-                            <h6 class="font-semibold text-primary-700 mb-2">개선 영역</h6>
-                            <ul class="list-disc list-inside text-primary-600 space-y-1">
-                                ${detailedFeedback.improvementAreas.map(area => `<li>${area}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                </div>
-            </section>
-        `;
-    }
+    // 상세분석 섹션은 사용자 요청으로 제거되었습니다.
 
     function generateSatisfactionSurveySection() {
         return `

@@ -7,7 +7,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npx @modelcontextprotocol/server-supabase:*)",
+      "Bash(npm search:*)",
+      "WebSearch",
+      "Bash(npx:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

@@ -76,12 +76,12 @@ Please provide a detailed analysis in the following JSON format:
             "original": "Current expression",
             "suggestions": [
                 {
-                    "improved": "Improvement option 1",
-                    "level": "Basic/Intermediate/Advanced",
-                    "nuance": "Nuance explanation (Korean)"
+                    "improved": "How Americans would naturally say it",
+                    "level": "Casual/Neutral/Formal",
+                    "nuance": "Why this sounds natural to Americans (Korean)"
                 }
             ],
-            "tip": "💡 Practical tip (Korean)"
+            "tip": "💡 Practical tip tailored for American usage (Korean)"
         }
     ],
     
@@ -104,7 +104,7 @@ Please provide a detailed analysis in the following JSON format:
             {
                 "word": "Word/Expression",
                 "usage": "Proper usage",
-                "collocations": ["Common collocations"]
+                "synonyms": ["Close synonym 1", "Close synonym 2"]
             }
         ]
     },
@@ -131,6 +131,10 @@ Please provide a detailed analysis in the following JSON format:
 - 📝 Explain "why" for each correction
 - 🔄 Group similar mistakes into patterns
 - 📚 Provide practical, usable example sentences
+
+**Section Requirements Clarification:**
+- "betterExpressions" MUST focus on how Americans would naturally say it. Prefer concise, idiomatic phrasing as actually spoken/written in the U.S.; avoid merely more formal or longer variants.
+- In "learningPoints.vocabularyTips", include close meaning synonyms instead of collocations. Provide 2-4 synonyms commonly used in American English.
 
 **Special Instructions for Korean Learners:**
 - Pay special attention to article usage (a/an/the)
@@ -373,15 +377,9 @@ Please provide a detailed analysis in the following JSON format:
                 : [];
 
             const grammarAnalysis = (raw.learningPoints?.grammarPatterns || [])
-                .map(p => `• ${p.pattern} → ${p.correct}\n  예시: ${p.practice}`).join('\n\n');
+                .map(p => `• ${p.pattern} → ${p.correct} (ex: ${p.practice})`).join('\n');
             const vocabularyAnalysis = (raw.learningPoints?.vocabularyTips || [])
-                .map(v => {
-                    let result = `• ${v.word}: ${v.usage}`;
-                    if (v.collocations && v.collocations.length > 0) {
-                        result += `\n  연어표현: ${v.collocations.join(', ')}`;
-                    }
-                    return result;
-                }).join('\n\n');
+                .map(v => `• ${v.word}: ${v.usage}${v.synonyms ? ` | synonyms: ${v.synonyms.join(', ')}` : ''}`).join('\n');
             const structureAnalysis = summary.oneLineFeedback || '';
             const improvementAreas = [raw.nextSteps?.focusArea, ...(raw.nextSteps?.exercises || [])].filter(Boolean);
 
