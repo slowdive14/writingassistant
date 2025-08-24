@@ -479,32 +479,14 @@
 
             ${generateStrengthsSection(analysis.strengths)}
             ${generateCorrectionsSection(analysis.corrections)}
+            ${generateCorrectedEssaySection(currentSubmission.content, analysis.corrections)}
             ${generateSuggestionsSection(analysis.suggestions)}
-            ${generateMustFixSection(raw.mustFix)}
             ${generateSatisfactionSurveySection()}
             ${generateActionButtonsSection()}
         `;
     }
 
-    function generateMustFixSection(items) {
-        if (!Array.isArray(items) || items.length === 0) return '';
-        return `
-            <section class="px-6 py-6">
-                <h4 class="text-lg font-heading font-semibold text-text-primary mb-3">우선 수정해야 할 것</h4>
-                <div class="space-y-3">
-                    ${items.slice(0,3).map(m => `
-                        <div class="bg-error-50 border border-error-200 rounded-xl p-4">
-                            <div class="text-xs mb-1">우선순위: ${m.priority || '🔴 High'}</div>
-                            <div class="text-sm"><span class="text-text-secondary">원문:</span> ${escapeHtml(m.original || '')}</div>
-                            <div class="text-sm mt-1"><span class="text-text-secondary">수정:</span> ${escapeHtml(m.corrected || '')}</div>
-                            ${m.rule ? `<div class='mt-2 text-xs text-text-secondary'>규칙: ${escapeHtml(m.rule)}</div>` : ''}
-                            ${m.example ? `<div class='mt-1 text-xs text-text-secondary'>예: ${escapeHtml(m.example)}</div>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </section>
-        `;
-    }
+    // 우선 수정해야 할 것 섹션은 사용자 요청으로 제거되었습니다.
 
     function generateBetterExpressionsSection(items) {
         if (!Array.isArray(items) || items.length === 0) return '';
@@ -600,6 +582,29 @@
                 </div>
             </section>
         `;
+    }
+
+    // Full corrected essay section
+    function generateCorrectedEssaySection(originalText, corrections) {
+        try {
+            const full = buildCorrectedEssay(originalText || '', corrections || []);
+            if (!full || full.trim().length === 0) return '';
+            return `
+                <section class="px-6 py-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M5 8h14"/>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-heading font-semibold text-text-primary">전체 교정본</h4>
+                    </div>
+                    <pre class="mt-2 p-4 bg-gray-50 rounded-xl overflow-x-auto text-sm whitespace-pre-wrap">${escapeHtml(full)}</pre>
+                </section>
+            `;
+        } catch (_) {
+            return '';
+        }
     }
 
     function generateSuggestionsSection(suggestions) {
