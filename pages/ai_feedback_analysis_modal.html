@@ -353,7 +353,11 @@
             
             // Save analysis for statistics
             saveAnalysisToStats(analysis);
-            const correctedEssayToSave = buildCorrectedEssay(currentSubmission.content, analysis.corrections || []);
+            const correctedEssayToSave = buildCorrectedEssay(
+                currentSubmission.content,
+                analysis.corrections || [],
+                analysis.suggestions || []
+            );
             persistHistory(currentSubmission, analysis, correctedEssayToSave);
             
             // Hide loading state
@@ -479,7 +483,7 @@
 
             ${generateStrengthsSection(analysis.strengths)}
             ${generateCorrectionsSection(analysis.corrections)}
-            ${generateCorrectedEssaySection(currentSubmission.content, analysis.corrections)}
+            ${generateCorrectedEssaySection(currentSubmission.content, analysis.corrections, analysis.suggestions)}
             ${generateSuggestionsSection(analysis.suggestions)}
             ${generateSatisfactionSurveySection()}
             ${generateActionButtonsSection()}
@@ -585,9 +589,9 @@
     }
 
     // Full corrected essay section
-    function generateCorrectedEssaySection(originalText, corrections) {
+    function generateCorrectedEssaySection(originalText, corrections, suggestions) {
         try {
-            const full = buildCorrectedEssay(originalText || '', corrections || []);
+            const full = buildCorrectedEssay(originalText || '', corrections || [], suggestions || []);
             if (!full || full.trim().length === 0) return '';
             return `
                 <section class="px-6 py-6">
@@ -864,10 +868,25 @@
     }
 
     // Build a full corrected essay based on AI corrections
-    function buildCorrectedEssay(originalText, corrections) {
+    function buildCorrectedEssay(originalText, corrections, suggestions) {
         try {
             if (!Array.isArray(corrections) || corrections.length === 0) return originalText;
             let result = originalText;
+            // Apply better expression suggestions first
+            try {
+                const exprRepls = (Array.isArray(suggestions) ? suggestions : [])
+                    .filter(s => s && s.current && s.improved)
+                    .slice()
+                    .sort((a, b) => (b.current.length || 0) - (a.current.length || 0));
+                exprRepls.forEach(s => {
+                    try {
+                        const pattern = new RegExp(escapeRegExp(s.current), 'g');
+                        result = result.replace(pattern, s.improved);
+                    } catch (_) {
+                        result = result.split(s.current).join(s.improved);
+                    }
+                });
+            } catch (_) {}
             // Apply replacements safely by processing longer originals first
             const sorted = corrections
                 .filter(c => c && c.original && c.corrected)
